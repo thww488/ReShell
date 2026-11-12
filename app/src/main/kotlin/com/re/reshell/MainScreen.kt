@@ -19,6 +19,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
@@ -48,13 +49,13 @@ fun MainScreen(
     var showBookmarks by remember { mutableStateOf(false) }
 
     val subtitleText = if (!isConnected) {
-        "正在连接..."
+        stringResource(id = R.string.status_connecting)
     } else if (privilegeSource == "Shizuku") {
-        "已连接 Shizuku 特权 $currentUser"
+        stringResource(id = R.string.status_shizuku, currentUser)
     } else if (privilegeSource == "SU") {
-        "已连接 SU 特权 $currentUser"
+        stringResource(id = R.string.status_su, currentUser)
     } else {
-        "已连接本地 $currentUser"
+        stringResource(id = R.string.status_local, currentUser)
     }
 
     LaunchedEffect(outputs.size) {
@@ -80,7 +81,10 @@ fun MainScreen(
                             onDismissRequest = { showBookmarks = false }
                         ) {
                             if (bookmarks.isEmpty()) {
-                                DropdownMenuItem(text = { Text("暂无收藏") }, onClick = { showBookmarks = false })
+                                DropdownMenuItem(
+                                    text = { Text(stringResource(id = R.string.no_bookmarks)) }, 
+                                    onClick = { showBookmarks = false }
+                                )
                             } else {
                                 bookmarks.forEach { cmd ->
                                     DropdownMenuItem(
@@ -138,7 +142,7 @@ fun MainScreen(
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
                     Text(
-                        text = "指令框",
+                        text = stringResource(id = R.string.cmd_box),
                         style = MiuixTheme.textStyles.title4,
                         color = MiuixTheme.colorScheme.onSurfaceVariantSummary
                     )
@@ -148,8 +152,7 @@ fun MainScreen(
                         value = input,
                         onValueChange = { input = it },
                         modifier = Modifier.fillMaxWidth(),
-                        // 核心修复：直接传 String，千万不要加大括号
-                        label = "输入 Shell 指令",
+                        label = stringResource(id = R.string.cmd_hint),
                         leadingIcon = {
                             Text(
                                 text = if (isRoot) "#" else "$",
@@ -182,7 +185,11 @@ fun MainScreen(
                             },
                             modifier = Modifier.weight(1f)
                         ) {
-                            Text("收藏")
+                            // 加上 maxLines 防止折行
+                            Text(
+                                text = stringResource(id = R.string.cmd_bookmark),
+                                maxLines = 1
+                            )
                         }
                         
                         Button(
@@ -194,7 +201,10 @@ fun MainScreen(
                             },
                             modifier = Modifier.weight(2f)
                         ) {
-                            Text("执行")
+                            Text(
+                                text = stringResource(id = R.string.cmd_execute),
+                                maxLines = 1
+                            )
                         }
                     }
                 }

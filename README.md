@@ -47,7 +47,7 @@
 1. Ensure Shizuku is installed and activated on your phone.
 2. Open ReShell and grant Shizuku permissions as prompted.
 3. Enter Shell commands in the command box (e.g., pm list packages, top -n 1).
-4. If you need Root privileges, simply enter su (your phone must be rooted and have SukiSU/Magisk installed).
+4. If you need Root privileges, simply enter su (your phone must be rooted and have Root Manager installed).
 
 💖 Open Source Acknowledgments
 

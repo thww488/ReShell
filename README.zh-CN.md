@@ -44,7 +44,7 @@
 1. 确保手机已安装并激活了 Shizuku。
 2. 打开 ReShell，根据提示授予 Shizuku 权限。
 3. 在指令框输入 Shell 指令（如 pm list packages、top -n 1）。
-4. 如果需要 Root 权限，直接输入 su 即可（需手机已 Root 并安装了 SukiSU/Magisk）。
+4. 如果需要 Root 权限，直接输入 su 即可（需手机已 Root 并安装了 Root 管理器）。
 
 💖 开源致谢
 

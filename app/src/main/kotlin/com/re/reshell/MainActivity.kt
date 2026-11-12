@@ -32,7 +32,9 @@ class MainActivity : ComponentActivity() {
     
     private var baseUser by mutableStateOf("")
     private var currentUser by mutableStateOf("")
+    
     private var currentDir by mutableStateOf("/")
+    private var previousDir by mutableStateOf("") 
     
     private var showSettings by mutableStateOf(false)
     private var showAbout by mutableStateOf(false)
@@ -104,7 +106,7 @@ class MainActivity : ComponentActivity() {
 
         if (enableShizuku) checkShizuku() else {
             startLocalFallback()
-            outputs.add("[Shizuku 授权已关闭，使用本地权限]")
+            outputs.add(getString(R.string.log_shizuku_disabled))
         }
     }
 
@@ -120,7 +122,7 @@ class MainActivity : ComponentActivity() {
             try { shellManager.disconnect() } catch (_: Exception) {}
             withContext(Dispatchers.Main) {
                 startLocalFallback()
-                outputs.add("[已关闭 Shizuku 授权]")
+                outputs.add(getString(R.string.log_shizuku_closed))
             }
         }
     }
@@ -136,11 +138,15 @@ class MainActivity : ComponentActivity() {
             withContext(Dispatchers.Main) {
                 try {
                     if (!Shizuku.pingBinder()) {
+                        outputs.add(getString(R.string.log_shizuku_not_running))
                         startLocalFallback()
                         return@withContext
                     }
                     if (Shizuku.checkSelfPermission() == PackageManager.PERMISSION_GRANTED) connectShizukuShell() else Shizuku.requestPermission(REQUEST_CODE)
-                } catch (e: Exception) { startLocalFallback() }
+                } catch (e: Exception) { 
+                    outputs.add(getString(R.string.log_shizuku_error_fallback, e.message ?: ""))
+                    startLocalFallback() 
+                }
             }
         }
     }
@@ -152,7 +158,7 @@ class MainActivity : ComponentActivity() {
                 useShizuku = true
                 isReady = true
                 privilegeSource = "Shizuku"
-                outputs.add("[已连接 Shizuku]")
+                outputs.add(getString(R.string.log_shizuku_connected))
                 
                 val initUser = withContext(Dispatchers.IO) {
                     try { shellManager.execute("whoami") } catch (e: Exception) { "" }
@@ -162,12 +168,13 @@ class MainActivity : ComponentActivity() {
                 currentUser = initUser
                 isRoot = (initUser == "root")
                 
-                withContext(Dispatchers.IO) {
-                    shellManager.execute("mkdir -p $defaultDir")
-                }
+                withContext(Dispatchers.IO) { shellManager.execute("mkdir -p $defaultDir") }
                 currentDir = defaultDir
                 
-            } catch (e: Exception) { startLocalFallback() }
+            } catch (e: Exception) { 
+                outputs.add(getString(R.string.log_shizuku_conn_fail, e.message ?: ""))
+                startLocalFallback() 
+            }
         }
     }
 
@@ -175,22 +182,21 @@ class MainActivity : ComponentActivity() {
         useShizuku = false
         isReady = true
         privilegeSource = "本地"
-        baseUser = "应用"
-        currentUser = "应用"
+        // 核心修复：使用多语言资源
+        baseUser = getString(R.string.local_user)
+        currentUser = getString(R.string.local_user)
         isRoot = false
         
         lifecycleScope.launch(Dispatchers.IO) {
             nativeShell.execute("mkdir -p $defaultDir", "/")
-            withContext(Dispatchers.Main) {
-                currentDir = defaultDir
-            }
+            withContext(Dispatchers.Main) { currentDir = defaultDir }
         }
     }
 
     private fun executeCommand(command: String) {
         if (!isReady) {
             outputs.add("$ $command")
-            outputs.add("[Shell 尚未就绪]")
+            outputs.add(getString(R.string.log_shell_not_ready))
             return
         }
 
@@ -200,8 +206,9 @@ class MainActivity : ComponentActivity() {
         if (finalCmd.isBlank()) return
 
         val shortPath = when {
+            currentDir == defaultDir -> "~"
+            currentDir.startsWith("$defaultDir/") -> "~/" + currentDir.substringAfter("$defaultDir/")
             currentDir == "/" -> "/"
-            currentDir.contains("com.re.reshell") -> "~"
             else -> currentDir.substringAfterLast("/")
         }
         val promptPrefix = "$shortPath ${if (isRoot) "#" else "$"}"
@@ -217,13 +224,34 @@ class MainActivity : ComponentActivity() {
             }
 
             if (isCdCmd) {
-                val target = if (parts.size > 1) parts[1] else ""
-                val actualCmd = if (target.isBlank()) "cd && pwd" else "cd $target && pwd"
+                var target = if (parts.size > 1) parts[1] else "~"
+                if (target.startsWith("~")) target = target.replaceFirst("~", defaultDir)
+                if (target == "-") {
+                    if (previousDir.isNotBlank()) target = previousDir
+                    else {
+                        outputs.add("cd: OLDPWD not set")
+                        return@launch
+                    }
+                }
+                if (target.isBlank()) target = defaultDir
+
+                val actualCmd = "cd \"$target\" && pwd"
                 val res = withContext(Dispatchers.IO) {
                     if (useShizuku) shellManager.execute(actualCmd) else nativeShell.execute(actualCmd, currentDir)
                 }
-                val path = res.trim().lines().lastOrNull { it.startsWith("/") }
-                if (path != null) currentDir = path
+                
+                val lines = res.trim().lines()
+                val newPath = lines.lastOrNull { it.startsWith("/") }
+
+                if (newPath != null) {
+                    previousDir = currentDir
+                    currentDir = newPath
+                } else {
+                    val errRes = withContext(Dispatchers.IO) {
+                        if (useShizuku) shellManager.execute("cd \"$target\"") else nativeShell.execute("cd \"$target\"", currentDir)
+                    }
+                    if (errRes.isNotBlank()) outputs.add(errRes)
+                }
                 return@launch
             }
 
@@ -232,7 +260,7 @@ class MainActivity : ComponentActivity() {
                     currentUser = baseUser
                     isRoot = (currentUser == "root")
                     privilegeSource = if (useShizuku) "Shizuku" else "本地"
-                    outputs.add("[已退出特权模式，回到基础权限执行 su]")
+                    outputs.add(getString(R.string.log_su_exited))
                 }
 
                 if (finalCmd.contains("-c")) {
@@ -244,7 +272,7 @@ class MainActivity : ComponentActivity() {
                 }
 
                 var targetUser = if (parts.size > 1) parts[1] else "root"
-                outputs.add("[正在尝试请求 SU 特权 $targetUser...]")
+                outputs.add(getString(R.string.log_request_su, targetUser))
                 
                 val testCmd = "su $targetUser -c whoami"
                 val testResult = withContext(Dispatchers.IO) {
@@ -256,9 +284,9 @@ class MainActivity : ComponentActivity() {
                     currentUser = realUser
                     isRoot = (currentUser == "root")
                     privilegeSource = "SU"
-                    outputs.add("[已连接到 SU 特权 $currentUser]")
+                    outputs.add(getString(R.string.log_su_connected, currentUser))
                 } else {
-                    outputs.add("[未能获取 SU 特权，请前往 SukiSU/Magisk 管理器授权]")
+                    outputs.add(getString(R.string.log_su_failed))
                 }
                 return@launch
             }
@@ -268,15 +296,15 @@ class MainActivity : ComponentActivity() {
                     currentUser = baseUser
                     isRoot = (currentUser == "root")
                     privilegeSource = if (useShizuku) "Shizuku" else "本地"
-                    outputs.add("[已退回到 $currentUser 特权]")
+                    outputs.add(getString(R.string.log_reverted_privilege, currentUser))
                 } else {
-                    outputs.add("[已在基础权限下]")
+                    outputs.add(getString(R.string.log_base_privilege))
                 }
                 return@launch
             }
 
             var actualCmd = finalCmd
-            if (currentUser != baseUser && currentUser != "应用") {
+            if (currentUser != baseUser && currentUser != getString(R.string.local_user)) {
                 val escapedCmd = finalCmd.replace("\"", "\\\"")
                 actualCmd = "su $currentUser -c \"$escapedCmd\""
             }
@@ -284,7 +312,9 @@ class MainActivity : ComponentActivity() {
             val result = withContext(Dispatchers.IO) {
                 try {
                     if (useShizuku) shellManager.execute(actualCmd) else nativeShell.execute(actualCmd, currentDir)
-                } catch (e: Exception) { "执行错误: ${e.message}" }
+                } catch (e: Exception) { 
+                    getString(R.string.log_exec_error, e.message ?: "") 
+                }
             }
             if (result.isNotBlank()) outputs.add(result)
         }
@@ -294,12 +324,12 @@ class MainActivity : ComponentActivity() {
         if (cmd.isBlank() || bookmarks.contains(cmd)) return
         bookmarks.add(cmd)
         prefs.edit().putStringSet("bookmarks", bookmarks.toSet()).apply()
-        outputs.add("[已添加收藏: $cmd]")
+        outputs.add(getString(R.string.log_added_bookmark, cmd))
     }
 
     private fun removeBookmark(cmd: String) {
         bookmarks.remove(cmd)
         prefs.edit().putStringSet("bookmarks", bookmarks.toSet()).apply()
-        outputs.add("[已移除收藏: $cmd]")
+        outputs.add(getString(R.string.log_removed_bookmark, cmd))
     }
 }

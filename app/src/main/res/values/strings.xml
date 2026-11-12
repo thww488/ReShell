@@ -1,3 +1,53 @@
 <resources>
-    <string name="app_name">Reshell</string>
+    <string name="app_name">ReShell</string>
+    
+    <!-- 状态提示 -->
+    <string name="status_connecting">正在连接...</string>
+    <string name="status_shizuku">已连接 Shizuku 特权 %1$s</string>
+    <string name="status_su">已连接 SU 特权 %1$s</string>
+    <string name="status_local">已连接本地 %1$s</string>
+    <string name="local_user">应用</string>
+    
+    <!-- 主界面 -->
+    <string name="cmd_box">指令框</string>
+    <string name="cmd_hint">输入 Shell 指令</string>
+    <string name="cmd_bookmark">收藏</string>
+    <string name="cmd_execute">执行</string>
+    <string name="no_bookmarks">暂无收藏</string>
+    
+    <!-- 设置界面 -->
+    <string name="settings">设置</string>
+    <string name="back">返回</string>
+    <string name="enable_shizuku">启用 Shizuku 特权</string>
+    <string name="enable_shizuku_desc">关闭后 App 将不再请求授权，直接以本地普通应用权限运行。</string>
+    <string name="default_dir">默认启动目录</string>
+    <string name="default_dir_hint">输入路径</string>
+    <string name="apply_dir">应用目录</string>
+    <string name="about_reshell">关于 ReShell</string>
+    <string name="about_desc">版本、作者与开源许可</string>
+    
+    <!-- 关于界面 -->
+    <string name="about">关于</string>
+    <string name="version">版本 v%1$s</string>
+    <string name="author_profile">作者主页</string>
+    <string name="repo">开源仓库</string>
+    <string name="acknowledgements">开源致谢</string>
+
+    <!-- 终端日志提示 -->
+    <string name="log_shizuku_not_running">[Shizuku 未运行，即将以普通应用权限运行]</string>
+    <string name="log_shizuku_error_fallback">[Shizuku 异常: %1$s，即将以普通应用权限运行]</string>
+    <string name="log_shizuku_connected">[已连接 Shizuku]</string>
+    <string name="log_shizuku_conn_fail">[Shizuku 连接失败: %1$s，降级为普通应用权限]</string>
+    <string name="log_shizuku_closed">[已关闭 Shizuku 授权]</string>
+    <string name="log_shizuku_disabled">[Shizuku 授权已关闭，使用本地权限]</string>
+    <string name="log_request_su">[正在尝试请求 SU 特权 %1$s...]</string>
+    <string name="log_su_connected">[已连接到 SU 特权 %1$s]</string>
+    <string name="log_su_failed">[未能获取 SU 特权，请前往 SukiSU/Magisk 管理器授权]</string>
+    <string name="log_su_exited">[已退出特权模式，回到基础权限执行 su]</string>
+    <string name="log_reverted_privilege">[已退回到 %1$s 特权]</string>
+    <string name="log_base_privilege">[已在基础权限下]</string>
+    <string name="log_added_bookmark">[已添加收藏: %1$s]</string>
+    <string name="log_removed_bookmark">[已移除收藏: %1$s]</string>
+    <string name="log_shell_not_ready">[Shell 尚未就绪]</string>
+    <string name="log_exec_error">执行错误: %1$s</string>
 </resources>

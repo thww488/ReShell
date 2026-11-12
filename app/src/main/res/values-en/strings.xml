@@ -1,0 +1,53 @@
+<resources>
+    <string name="app_name">ReShell</string>
+    
+    <!-- Status -->
+    <string name="status_connecting">Connecting...</string>
+    <string name="status_shizuku">Connected to Shizuku %1$s</string>
+    <string name="status_su">Connected to SU %1$s</string>
+    <string name="status_local">Connected to Local %1$s</string>
+    <string name="local_user">App</string>
+    
+    <!-- Main -->
+    <string name="cmd_box">Command</string>
+    <string name="cmd_hint">Enter Shell command</string>
+    <string name="cmd_bookmark">Bookmark</string>
+    <string name="cmd_execute">Run</string>
+    <string name="no_bookmarks">No bookmarks yet</string>
+    
+    <!-- Settings -->
+    <string name="settings">Settings</string>
+    <string name="back">Back</string>
+    <string name="enable_shizuku">Enable Shizuku Privilege</string>
+    <string name="enable_shizuku_desc">When disabled, the app will not request authorization and will run with local normal app privileges.</string>
+    <string name="default_dir">Default Startup Directory</string>
+    <string name="default_dir_hint">Enter path</string>
+    <string name="apply_dir">Apply Directory</string>
+    <string name="about_reshell">About ReShell</string>
+    <string name="about_desc">Version, Author &amp; Licenses</string>
+    
+    <!-- About -->
+    <string name="about">About</string>
+    <string name="version">Version v%1$s</string>
+    <string name="author_profile">Author Profile</string>
+    <string name="repo">Open Source Repo</string>
+    <string name="acknowledgements">Acknowledgements</string>
+    
+    <!-- Terminal Logs -->
+    <string name="log_shizuku_not_running">[Shizuku not running, using normal app privileges]</string>
+    <string name="log_shizuku_error_fallback">[Shizuku error: %1$s, using normal app privileges]</string>
+    <string name="log_shizuku_connected">[Connected to Shizuku]</string>
+    <string name="log_shizuku_conn_fail">[Shizuku connection failed: %1$s, falling back to normal app privileges]</string>
+    <string name="log_shizuku_closed">[Shizuku authorization closed]</string>
+    <string name="log_shizuku_disabled">[Shizuku authorization disabled, using local privileges]</string>
+    <string name="log_request_su">[Attempting to request SU privileges for %1$s...]</string>
+    <string name="log_su_connected">[Connected to SU privileges: %1$s]</string>
+    <string name="log_su_failed">[Failed to get SU privileges. Please grant authorization in Root Manager]</string>
+    <string name="log_su_exited">[Exited privilege mode, returning to base privilege to execute su]</string>
+    <string name="log_reverted_privilege">[Reverted to %1$s privilege]</string>
+    <string name="log_base_privilege">[Already at base privilege]</string>
+    <string name="log_added_bookmark">[Added bookmark: %1$s]</string>
+    <string name="log_removed_bookmark">[Removed bookmark: %1$s]</string>
+    <string name="log_shell_not_ready">[Shell is not ready yet]</string>
+    <string name="log_exec_error">Execution error: %1$s</string>
+</resources>

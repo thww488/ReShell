@@ -12,12 +12,13 @@ import androidx.compose.material3.Switch
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight // 核心修复：补上 FontWeight 导入
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import top.yukonga.miuix.kmp.basic.*
-import top.yukonga.miuix.kmp.theme.MiuixTheme // 核心修复：补上 MiuixTheme 导入
+import top.yukonga.miuix.kmp.theme.MiuixTheme
 
 @Composable
 fun SettingsScreen(
@@ -33,10 +34,10 @@ fun SettingsScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = "设置",
+                title = stringResource(id = R.string.settings),
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "返回")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(id = R.string.back))
                     }
                 }
             )
@@ -48,7 +49,6 @@ fun SettingsScreen(
                 .padding(padding)
                 .padding(16.dp)
         ) {
-            // 1. Shizuku 开关
             Card(cornerRadius = 16.dp, modifier = Modifier.fillMaxWidth().padding(bottom = 12.dp)) {
                 Row(
                     modifier = Modifier.fillMaxWidth().padding(16.dp),
@@ -56,10 +56,10 @@ fun SettingsScreen(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Column(modifier = Modifier.weight(1f)) {
-                        Text("启用 Shizuku 特权", style = MiuixTheme.textStyles.title4)
+                        Text(stringResource(id = R.string.enable_shizuku), style = MiuixTheme.textStyles.title4)
                         Spacer(Modifier.height(4.dp))
                         Text(
-                            "关闭后 App 将不再请求授权，直接以本地普通应用权限运行。",
+                            stringResource(id = R.string.enable_shizuku_desc),
                             fontSize = 13.sp,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -72,18 +72,16 @@ fun SettingsScreen(
                 }
             }
 
-            // 2. 启动目录设置
             Card(cornerRadius = 16.dp, modifier = Modifier.fillMaxWidth().padding(bottom = 12.dp)) {
                 Column(modifier = Modifier.padding(16.dp)) {
-                    Text("默认启动目录", style = MiuixTheme.textStyles.title4)
+                    Text(stringResource(id = R.string.default_dir), style = MiuixTheme.textStyles.title4)
                     Spacer(Modifier.height(8.dp))
                     
                     TextField(
                         value = dirInput,
                         onValueChange = { dirInput = it },
                         modifier = Modifier.fillMaxWidth(),
-                        // 修复：直接传 String
-                        label = "输入路径", 
+                        label = stringResource(id = R.string.default_dir_hint),
                         singleLine = true,
                         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
                         keyboardActions = KeyboardActions(
@@ -103,12 +101,11 @@ fun SettingsScreen(
                         },
                         modifier = Modifier.fillMaxWidth()
                     ) {
-                        Text("应用目录")
+                        Text(stringResource(id = R.string.apply_dir))
                     }
                 }
             }
 
-            // 3. 关于入口
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 cornerRadius = 16.dp,
@@ -125,8 +122,8 @@ fun SettingsScreen(
                     )
                     Spacer(Modifier.width(16.dp))
                     Column(modifier = Modifier.weight(1f)) {
-                        Text("关于 ReShell", fontSize = 16.sp, fontWeight = FontWeight.Medium)
-                        Text("版本、作者与开源许可", fontSize = 13.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Text(stringResource(id = R.string.about_reshell), fontSize = 16.sp, fontWeight = FontWeight.Medium)
+                        Text(stringResource(id = R.string.about_desc), fontSize = 13.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
                     Icon(
                         Icons.AutoMirrored.Filled.KeyboardArrowRight,
